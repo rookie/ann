@@ -22,6 +22,9 @@ class Neuron
   def name=(name)
     @name = name
   end
+  #now if you didnt want to do any parsing to test for valid
+  attr_accessor :altname
+  
 
   def initialize(input_layer_arg, operation_type)
     @input_layer = input_layer_arg
