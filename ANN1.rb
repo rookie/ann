@@ -12,6 +12,16 @@
 
 class Neuron
   # Ignore this class for now.
+  
+  #lets say we want an instance variable of a name for each of them.
+  #here is the getter
+  def name
+    @name #instance variable
+  end
+  #and the setter
+  def name=(name)
+    @name = name
+  end
 
   def initialize(input_layer_arg, operation_type)
     @input_layer = input_layer_arg
