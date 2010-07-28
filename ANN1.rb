@@ -25,11 +25,20 @@ class Neuron
   #now if you didnt want to do any parsing to test for valid
   attr_accessor :altname
   
+  def to_s()
+    unless @name.nil?
+      string = "Hi my name is " + @name
+      unless @altname.nil?
+        string = string + ", aka " + @altname
+      end
+    end
+    string
+  end
 
   def initialize(input_layer_arg, operation_type)
     @input_layer = input_layer_arg
-    @number_of_inputs = @input_layer.length
-    set_weights(@number_of_inputs)
+    @number_of_inputs = 0#@input_layer.length
+    #set_weights(@number_of_inputs)
     @neuron_type = operation_type
   end
   
@@ -196,3 +205,8 @@ ARGV.each do |argument|
 end
 
 # This is where some layers should be made
+n1 = Neuron.new(0,0)
+n1.name = "john"
+puts n1
+n1.altname = "awesome"
+puts n1
