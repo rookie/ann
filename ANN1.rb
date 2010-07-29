@@ -11,95 +11,67 @@
 # (3) define methods
 
 class Neuron
-  # Ignore this class for now.
-  
-  #lets say we want an instance variable of a name for each of them.
-  #here is the getter
-  def name
-    @name #instance variable
+  # 
+
+  #this is actually a place holder for now.  It's easier to think in terms of
+  # "what are the inputs/outputs" than "how bout I waste a bunch of time making functions."
+  # If any of them need to be updated later, I'll deal with it.
+  attr_accessor :number_of_inputs, :neuron_operation
+
+  def initialize(input_layer_object, operation_name, input_weight_array)
+    number_of_inputs(input_layer_object)
+    neuron_type(operation_name)
+    input_weights(input_weight_array)
   end
-  #and the setter
-  def name=(name)
-    @name = name
+
+  #also demonstrating that I get it for the setters/getters, this does a check
+  #on the size of the array to ensure that it is valid.  (There must be an element
+  #in the array of weights for each input node, even if those weights are zero)
+  def input_weights
+    if @input_weights.length == @number_of_inputs
+      @input_weights
+    else
+      #return some kind of error to indicate that this isn't working properly
+    end
   end
-  #now if you didnt want to do any parsing to test for valid
-  attr_accessor :altname
   
-  def to_s()
-    unless @name.nil?
-      string = "Hi my name is " + @name
-      unless @altname.nil?
-        string = string + ", aka " + @altname
+  def input_weights= (array_of_weights)
+    if array_of_weights.nil? || array_of_weights.length != @number_of_inputs
+      for index in 0..@number_of_inputs
+        @input_weights[index] = rand()
       end
+    else
+      @input_weights = array_of_weights
     end
-    string
   end
 
-  def initialize(input_layer_arg, operation_type)
-    @input_layer = input_layer_arg
-    @number_of_inputs = 0#@input_layer.length
-    #set_weights(@number_of_inputs)
-    @neuron_type = operation_type
+  def sum_inputs
+    array_element_mult(@input_weights, @input_layer.neuron).sum
   end
   
-  def set_weights()
-    # either read some weights from the line matching the layer index in a text file,
-    # or generate some random ones
-    for index in 0..@number_of_inputs
-      @input_weights[index] = rand()
-    end
-    
-  end
-
-  def sum_inputs()
-    
-    array_product = array_element_mult(@input_weights, @input_layer.neuron)
-    
-    for index in 0..array_product.length
-      element_sum += array_product[index]
-    end
-    
-    #for index in 0..@number_of_inputs
-    #  @neuron_sum += @input_weights[index]*input_layer.neuron[index]
-    #end
-  
+  #to get a "normal" ANN, ignore the mult_inputs method
+  def mult_inputs
+    array_element_mult(@input_weights, @input_layer.neuron).inject(1) {|product,n| product*n}
   end
   
-  def mult_inputs()
-    
-    #found this online - may not work the way I want though.
-    #@neuron_product = @input_weights.zip(input_layer.neuron).map {|x,y| x*y}
-    
-    #@neuron_product = 1   # this must be reset at 1, in case it was previously zero
-    #for index in 0..@number_of_inputs
-    #  @neuron_product *= @input_weights[index]*input_layer.neuron[index]
-    #end
-    
-    array_product = array_element_mult(@input_weights, @input_layer.neuron)
-    
-    for index in 0..array_product.length
-      element_product *= array_product[index]
-    end
-    
-  end
-  
-  def rss_inputs()
-  
+  #to get a "normal" ANN, ignore the rss_inputs method
+  def rss_inputs
     Math.sqrt(mult_inputs(@input_layer))
-    
   end
   
+  #made this its own method because (1) it takes arguments, and (2) it is common
+  # to the sum, mult, and rss_inputs methods
   def array_element_mult(array_a, array_b)
-    
-    result = array_a.zip(array_b).map {|x,y| x*y}
-    
+    array_a.zip(array_b).map {|x,y| x*y}
   end
   
+  #TANH is a very standard activation function; alternatives include all families
+  # of 1-exp(x) - they behave similarly to TANH
   def activation_function(value)
     Math.tanh(value)
   end
   
-  def get_output()
+  def neuron_value
     case @neuron_type
       when "sum"
         @neuron_value = activation_function(sum_inputs())
@@ -112,12 +84,12 @@ class Neuron
     end 
   end 
   
-  # Algorithm
-  # (1) calculate the value of node n
-  #   (2) look at the output lines, move to the next node that is the most effected by this result
-  #   (3) estimate the value of this node, trace the lines for the next input in the list that is likely to effect the output state
-  #     (4) trace back that line, then move back to 
 end
+
+#    ============================STOP HERE=======================
+# HEY MATT
+# on 7/29/2010, you should ignore everything below this line. I haven't updated it yet
+#    ============================STOP HERE=======================
 
 class Layer
   # This class defines an object that contains an arbitrary number of neurons.  
@@ -185,16 +157,13 @@ ARGV.each do |argument|
 
   if ARGV.length > 0
     
-    if File.exists?(argument)
+    if File.exists(argument)
       #this would mean that the input file exists, so we should read in parameters
-      print "File exists\n"
     else # The file name doesn't exist
       #this means that the input file doesn't exist, so we should generate new parameters
-      print "File doesnt exist\n"
     end
     
-  else # There are no input arguments  
-    print "No arguments\n"
+  else # There are no input arguments
     
     # should probably be a puts here that explains proper command line syntax,
     # or at least throws some kind of error so that you know it didn't work
@@ -205,8 +174,3 @@ ARGV.each do |argument|
 end
 
 # This is where some layers should be made
-n1 = Neuron.new(0,0)
-n1.name = "john"
-puts n1
-n1.altname = "awesome"
-puts n1
