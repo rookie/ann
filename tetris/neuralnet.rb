@@ -14,12 +14,17 @@ class SNeuron
     self.weights = Array.new(numInputs+1) { randomClamped() }
   end
   
+  def randomClamped 
+    rand(10)+1
+    #1
+  end
+  
 end
 
 
 
 
-class SNeuronLayar
+class SNeuronLayer
   #number of neurons in this layer
   attr_accessor :numNeurons
   
@@ -28,7 +33,7 @@ class SNeuronLayar
   
   def initialize(numNeurons, inputsPerNeuron)
     self.numNeurons = numNeurons
-    self.neurons = Array.new(numNeurons) { Neuron.new(inputsPerNeuron) }
+    self.neurons = Array.new(numNeurons) { SNeuron.new(inputsPerNeuron) }
   end
   
 end
@@ -40,14 +45,36 @@ class CNeuralNet
   @numHiddenLayers
   @neuronsPerHiddenLayer
   #storage for each layer of neurons including the output layer
-  @layers
+  attr_reader :layers
   
   #public
   def initialize
-    @layers = Array.new
+    @numInputs  = NNParams.numInputs
+    @numOutputs = NNParams.numOutputs
+    @numHiddenLayers = NNParams.numHiddenLayers
+    @neuronsPerHiddenLayer = NNParams.neuronsPerHiddenLayer
+    
+    self.createNet()
   end
   
   def createNet
+    if @numHiddenLayers > 0
+      @layers = Array.new
+      @layers.push(SNeuronLayer.new(@neuronsPerHiddenLayer, @numInputs))
+      
+      #add the rest of em
+      for i in 0..(@numHiddenLayers-1-1)
+        puts "hello"
+        
+        @layers.push(SNeuronLayer.new(@neuronsPerHiddenLayer, @neuronsPerHiddenLayer))
+      end
+      
+      #create output layer
+      @layers.push(SNeuronLayer.new(@numOutputs, @neuronsPerHiddenLayer))
+    else
+  	  #create output layer
+  	  m_vecLayers.push_back(SNeuronLayer(m_NumOutputs, m_NumInputs));
+    end
   end
   
   #gets the weights from the NN
@@ -121,13 +148,45 @@ class CNeuralNet
 end
 
 class NNParams
+  @@numInputs  = 10
+  @@numOutputs = 1
+  @@numHiddenLayers  = 1
+  @@neuronsPerHiddenLayer = 5
+  
+  def self.numInputs; @@numInputs; end
+  def self.numOutputs; @@numOutputs; end
+  def self.numHiddenLayers; @@numHiddenLayers; end
+  def self.neuronsPerHiddenLayer; @@neuronsPerHiddenLayer; end
+  
+  
   @@bias = 1
   @@activationResponse = 1
   
   def self.bias; @@bias; end
-  #def self.bias=( value ); @@bias = value; end
   def self.activationResponse; @@activationResponse; end
-  #def self.activationResponse=( value ); @@activationResponse = value; end
 end
 
-
+puts "NEURON"
+one = SNeuron.new(10)
+p one.numInputs
+p one.weights
+puts "\nLAYER (5, 10)"
+lay = SNeuronLayer.new(5, 10)
+p lay.numNeurons
+for neuron in lay.neurons
+  puts 'neuron'
+  p neuron.numInputs
+  p neuron.weights
+end
+puts "\nNET"
+net = CNeuralNet.new
+for layer in net.layers
+  puts "LAYER with " + layer.numNeurons.to_s + " neurons"
+  puts "layer inputs: " + layer.neurons[0].numInputs.to_s
+  for neuron in layer.neurons
+    puts 'neuron'
+    puts "neurons inputs: " + neuron.numInputs.to_s
+    puts "weights: "
+    p neuron.weights
+  end
+end
