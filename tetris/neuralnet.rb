@@ -44,6 +44,7 @@ class CNeuralNet
   
   #public
   def initialize
+    @layers = Array.new
   end
   
   def createNet
@@ -66,12 +67,14 @@ class CNeuralNet
     outputs = Array.new
     weight = 0
     #first check that we have the correct amount of inputs
-    if inputs.size != @numInputs) do
+    if inputs.size != @numInputs
       #just return an empty vector if incorrect.
       outputs
     end
 
-    for i=0; i<@numHiddenLayars+1; i++ do
+    
+    for i in 0..@numHiddenLayars do
+    #for i=0; i<@numHiddenLayars+1; i++ do
       
       if i > 0
         inputs = outputs
@@ -81,16 +84,33 @@ class CNeuralNet
       weight = 0
       #for each neuron sum the (inputs * corresponding weights).Throw
       #the total at our sigmoid function to get the output.
-      
-      
-      
-      
-      
+      for j in 0..(@layers[i].numNeurons-1) do
+        netInput = 0
+        currentNumInputs = @layers[i].neurons[0].numInputs
+        
+        #for each weight
+        for k in 0..(currentNumInputs-2) do
+          #sum the weights x inputs
+          netInput += @layers[i].neurons[j].weights[k] # * inputs[weight]
+          weight+=1
+        end
+        
+        #add in the bias
+        netInput += @layers[i].neurons[j].weights[currentNumInputs - 1] * NNParams.bias
+        
+        #we can store the outputs from each layer as we generate them.
+        #The combined activation is first filtered through the sigmoid
+        #function
+        
+        outputs.push(sigmoid(netInput, NNParams.activationResponse))
+        
+        weight = 0;
+      end
       
     end
-
-
-
+    
+    #return
+    outputs
   end
     
   #sigmoid response curve
@@ -98,6 +118,16 @@ class CNeuralNet
   end
   
   
-  
-  
 end
+
+class NNParams
+  @@bias = 1
+  @@activationResponse = 1
+  
+  def self.bias; @@bias; end
+  #def self.bias=( value ); @@bias = value; end
+  def self.activationResponse; @@activationResponse; end
+  #def self.activationResponse=( value ); @@activationResponse = value; end
+end
+
+
